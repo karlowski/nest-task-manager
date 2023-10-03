@@ -5,7 +5,7 @@ import { Model } from 'mongoose';
 import { ITask } from 'src/interfaces/task.interface';
 import { EntityNotFound } from 'src/exceptions/entity-not-found.exception';
 import { CreateTaskDto } from 'src/dto/create-task.dto';
-import { TaskOperation } from 'src/interfaces/task-operation.interface';
+import { ApiOperation } from 'src/interfaces/api-operation.interface';
 import { UpdateTaskDto } from 'src/dto/update-task.dto';
 import { TaskResponse } from 'src/interfaces/task-response.interface';
 
@@ -28,7 +28,7 @@ export class TasksService {
     return this.taskModel.find();
   }
 
-  async create(task: CreateTaskDto): Promise<TaskOperation<TaskResponse>> {
+  async create(task: CreateTaskDto): Promise<ApiOperation<TaskResponse>> {
     const { _id, name, description, status, project, creationTime } = await this.taskModel.create({ ...task, creationTime: Date.now() });
 
     return { 
@@ -37,7 +37,7 @@ export class TasksService {
     };
   }
 
-  async update(id: string, taskDetails: UpdateTaskDto): Promise<TaskOperation<TaskResponse>> {
+  async update(id: string, taskDetails: UpdateTaskDto): Promise<ApiOperation<TaskResponse>> {
     const task = await this.taskModel.findById(id);
 
     if (!task) throw new EntityNotFound();
@@ -58,7 +58,7 @@ export class TasksService {
     };
   }
 
-  async delete(id: string): Promise<TaskOperation<TaskResponse>> {
+  async delete(id: string): Promise<ApiOperation<TaskResponse>> {
     const task = await this.taskModel.findById(id);
 
     if (!task) throw new EntityNotFound();
