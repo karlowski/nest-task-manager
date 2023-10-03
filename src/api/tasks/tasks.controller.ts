@@ -1,7 +1,9 @@
-import { Body, Controller, Delete, Get, Param, ParseIntPipe, Post } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, ParseIntPipe, Post, UseGuards } from '@nestjs/common';
 
 import { TasksService } from './tasks.service';
+import { AuthGuard } from 'src/guards/auth.guard';
 
+@UseGuards(AuthGuard)
 @Controller('tasks')
 export class TasksController {
   constructor(private tasksService: TasksService) {}
