@@ -16,18 +16,6 @@ export class TasksService {
     private taskModel: Model<ITask>
   ) {}
 
-  async getById(id: string): Promise<ITask> {
-    const task = await this.taskModel.findById(id);
-
-    if (!task) throw new EntityNotFound(); 
-
-    return task;
-  }
-
-  async getAll(): Promise<ITask[]> {
-    return this.taskModel.find();
-  }
-
   async create(task: CreateTaskDto): Promise<ApiOperation<TaskResponse>> {
     const { _id, name, description, status, project, creationTime } = await this.taskModel.create({ ...task, creationTime: Date.now() });
 
@@ -35,6 +23,18 @@ export class TasksService {
       message: 'Task created successfully',
       data: { id: _id, name, description, status, project, creationTime }
     };
+  }
+
+  async getAll(): Promise<ITask[]> {
+    return this.taskModel.find().populate({ path: 'project', select: 'name description' });
+  }
+
+  async getById(id: string): Promise<ITask> {
+    const task = await this.taskModel.findById(id).populate({ path: 'project', select: 'name description' });
+
+    if (!task) throw new EntityNotFound(); 
+
+    return task;
   }
 
   async update(id: string, taskDetails: UpdateTaskDto): Promise<ApiOperation<TaskResponse>> {
