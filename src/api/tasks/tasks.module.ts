@@ -6,6 +6,7 @@ import { TasksService } from './tasks.service';
 import { TaskSchema } from 'src/schemes/task.scheme';
 import { ObjectIdParserMiddleware } from 'src/middlewares/object-id-parser.middleware';
 import { ProjectSchema } from 'src/schemes/project.scheme';
+import { TaskStatusParserMiddleware } from 'src/middlewares/task-status-parser.middleware';
 
 @Module({
   imports: [
@@ -19,6 +20,8 @@ import { ProjectSchema } from 'src/schemes/project.scheme';
 })
 export class TasksModule implements NestModule {
   configure(consumer: MiddlewareConsumer) {
-    consumer.apply(ObjectIdParserMiddleware).forRoutes('tasks/:id');
+    consumer
+      .apply(ObjectIdParserMiddleware).forRoutes('tasks/:id')
+      .apply(TaskStatusParserMiddleware).forRoutes('tasks/:id/status');
   }
 }

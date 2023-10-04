@@ -33,6 +33,11 @@ export class TasksController {
     return this.tasksService.update(id, task);
   }
 
+  @Patch(':id/status')
+  changeStatus(@Param('id') id: string, @Body() { status }: Record<string, string>): Promise<ApiOperation<TaskResponse>> {
+    return this.tasksService.update(id, { status });
+  }
+
   @Delete(':id')
   delete(@Param('id') id: string): Promise<ApiOperation<TaskResponse>> {
     return this.tasksService.delete(id);
