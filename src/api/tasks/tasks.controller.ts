@@ -1,4 +1,4 @@
-import { Body, Controller, Delete, Get, Param, ParseIntPipe, Patch, Post, UseGuards } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, Patch, Post, UseGuards } from '@nestjs/common';
 
 import { TasksService } from './tasks.service';
 import { AuthGuard } from 'src/guards/auth.guard';
@@ -13,19 +13,19 @@ import { TaskResponse } from 'src/interfaces/task-response.interface';
 export class TasksController {
   constructor(private tasksService: TasksService) {}
 
-  @Get(':id')
-  getById(@Param('id') id: string): Promise<ITask> {
-    return this.tasksService.getById(id);
+  @Post()
+  create(@Body() task: CreateTaskDto): Promise<ApiOperation<TaskResponse>> {
+    return this.tasksService.create(task);
   }
 
   @Get()
   getAll(): Promise<ITask[]> {
     return this.tasksService.getAll();
   }
-
-  @Post()
-  create(@Body() task: CreateTaskDto): Promise<ApiOperation<TaskResponse>> {
-    return this.tasksService.create(task);
+  
+  @Get(':id')
+  getById(@Param('id') id: string): Promise<ITask> {
+    return this.tasksService.getById(id);
   }
 
   @Patch(':id')
