@@ -1,5 +1,8 @@
 import { Prop, Schema, SchemaFactory } from "@nestjs/mongoose";
-import { HydratedDocument } from "mongoose";
+import mongoose, { HydratedDocument, SchemaTypes, Types } from "mongoose";
+import { Type } from "class-transformer";
+
+import { Project } from "./project.scheme";
 
 export type TaskDocument = HydratedDocument<Task>;
 
@@ -14,8 +17,8 @@ export class Task {
   @Prop({ required: true })
   status: string;
 
-  @Prop({ required: false })
-  project: string;
+  @Prop({ type: Types.ObjectId, ref: 'Project' })
+  project: Project;
 }
 
 export const TaskSchema = SchemaFactory.createForClass(Task);
