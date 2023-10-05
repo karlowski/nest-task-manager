@@ -5,6 +5,7 @@ import { AuthGuard } from 'src/guards/auth.guard';
 import { CreateProjectDto } from 'src/dto/create-project.dto';
 import { ApiOperation } from 'src/interfaces/api-operation.interface';
 import { UpdateProjectDto } from 'src/dto/update-project.dto';
+import { ParseObjectIdPipe } from 'src/pipes/parse-object-id/parse-object-id.pipe';
 
 @UseGuards(AuthGuard)
 @Controller('projects')
@@ -22,17 +23,17 @@ export class ProjectsController {
   }
 
   @Get(':id')
-  getById(@Param('id') id: string): Promise<ApiOperation<any>> {
+  getById(@Param('id', ParseObjectIdPipe) id: string): Promise<ApiOperation<any>> {
     return this.projectsService.getById(id);
   }
 
   @Patch(':id')
-  update(@Param('id') id: string, @Body() project: UpdateProjectDto): Promise<ApiOperation<any>> {
+  update(@Param('id', ParseObjectIdPipe) id: string, @Body() project: UpdateProjectDto): Promise<ApiOperation<any>> {
     return this.projectsService.update(id, project);
   }
 
   @Delete(':id')
-  delete(@Param('id') id: string): Promise<ApiOperation<any>> {
+  delete(@Param('id', ParseObjectIdPipe) id: string): Promise<ApiOperation<any>> {
     return this.projectsService.delete(id);
   }
 }
