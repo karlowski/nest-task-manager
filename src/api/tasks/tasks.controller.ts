@@ -38,6 +38,16 @@ export class TasksController {
     return this.tasksService.update(id, { status });
   }
 
+  @Patch(':id/assign/:projectId')
+  assignToProject(@Param('id') id: string, @Param('projectId') projectId: string): Promise<ApiOperation<TaskResponse>> {
+    return this.tasksService.update(id, { project: projectId });
+  }
+
+  @Patch(':id/unassign')
+  UnassignFromProject(@Param('id') id: string): Promise<ApiOperation<TaskResponse>> {
+    return this.tasksService.update(id, { project: null });
+  }
+
   @Delete(':id')
   delete(@Param('id') id: string): Promise<ApiOperation<TaskResponse>> {
     return this.tasksService.delete(id);
