@@ -1,11 +1,10 @@
-import { MiddlewareConsumer, Module, NestModule } from '@nestjs/common';
+import { Module } from '@nestjs/common';
 import { MongooseModule } from '@nestjs/mongoose';
 
 import { ProjectsController } from './projects.controller';
 import { ProjectsService } from './projects.service';
 import { ProjectSchema } from 'src/schemes/project.scheme';
 import { TaskSchema } from 'src/schemes/task.scheme';
-import { ObjectIdParserMiddleware } from 'src/middlewares/object-id-parser.middleware';
 
 @Module({
   imports: [
@@ -17,8 +16,4 @@ import { ObjectIdParserMiddleware } from 'src/middlewares/object-id-parser.middl
   controllers: [ProjectsController],
   providers: [ProjectsService]
 })
-export class ProjectsModule implements NestModule {
-  configure(consumer: MiddlewareConsumer) {
-    consumer.apply(ObjectIdParserMiddleware).forRoutes('projects/:id');
-  }
-}
+export class ProjectsModule {}

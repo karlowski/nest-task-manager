@@ -16,7 +16,7 @@ export class Project {
   @Prop({ required: false })
   description: string;
 
-  @Prop([{ type: SchemaTypes.ObjectId, ref: 'Task' }])
+  @Prop([{ type: Task, ref: Task.name }])
   tasks: Task[];
 }
 

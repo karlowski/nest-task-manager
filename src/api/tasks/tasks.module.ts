@@ -1,10 +1,9 @@
-import { MiddlewareConsumer, Module, NestModule } from '@nestjs/common';
+import { Module } from '@nestjs/common';
 import { MongooseModule } from '@nestjs/mongoose';
 
 import { TasksController } from './tasks.controller';
 import { TasksService } from './tasks.service';
 import { TaskSchema } from 'src/schemes/task.scheme';
-import { ObjectIdParserMiddleware } from 'src/middlewares/object-id-parser.middleware';
 import { ProjectSchema } from 'src/schemes/project.scheme';
 
 @Module({
@@ -17,8 +16,4 @@ import { ProjectSchema } from 'src/schemes/project.scheme';
   controllers: [TasksController],
   providers: [TasksService]
 })
-export class TasksModule implements NestModule {
-  configure(consumer: MiddlewareConsumer) {
-    consumer.apply(ObjectIdParserMiddleware).forRoutes('tasks/:id');
-  }
-}
+export class TasksModule {}

@@ -7,6 +7,8 @@ import { ITask } from 'src/interfaces/task.interface';
 import { ApiOperation } from 'src/interfaces/api-operation.interface';
 import { UpdateTaskDto } from 'src/dto/update-task.dto';
 import { TaskResponse } from 'src/interfaces/task-response.interface';
+import { ParseObjectIdPipe } from 'src/pipes/parse-object-id/parse-object-id.pipe';
+import { ParseTaskStatusPipe } from 'src/pipes/parse-task-status/parse-task-status.pipe';
 
 @UseGuards(AuthGuard)
 @Controller('tasks')
@@ -24,17 +26,38 @@ export class TasksController {
   }
   
   @Get(':id')
-  getById(@Param('id') id: string): Promise<ITask> {
+  getById(@Param('id', ParseObjectIdPipe) id: string): Promise<ITask> {
     return this.tasksService.getById(id);
   }
 
   @Patch(':id')
-  update(@Param('id') id: string, @Body() task: UpdateTaskDto): Promise<ApiOperation<TaskResponse>> {
+  update(@Param('id', ParseObjectIdPipe) id: string, @Body() task: UpdateTaskDto): Promise<ApiOperation<TaskResponse>> {
     return this.tasksService.update(id, task);
   }
 
+  @Patch(':id/status')
+  changeStatus(
+    @Param('id', ParseObjectIdPipe) id: string, 
+    @Body(ParseTaskStatusPipe) { status }: Record<string, string>
+  ): Promise<ApiOperation<TaskResponse>> {
+    return this.tasksService.update(id, { status });
+  }
+
+  @Patch(':id/assign/:projectId')
+  assignToProject(
+    @Param('id', ParseObjectIdPipe) id: string, 
+    @Param('projectId', ParseObjectIdPipe) projectId: string
+  ): Promise<ApiOperation<TaskResponse>> {
+    return this.tasksService.update(id, { project: projectId });
+  }
+
+  @Patch(':id/unassign')
+  UnassignFromProject(@Param('id', ParseObjectIdPipe) id: string): Promise<ApiOperation<TaskResponse>> {
+    return this.tasksService.update(id, { project: null });
+  }
+
   @Delete(':id')
-  delete(@Param('id') id: string): Promise<ApiOperation<TaskResponse>> {
+  delete(@Param('id', ParseObjectIdPipe) id: string): Promise<ApiOperation<TaskResponse>> {
     return this.tasksService.delete(id);
   }
 
