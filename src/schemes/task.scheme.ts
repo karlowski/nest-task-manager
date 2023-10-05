@@ -11,7 +11,7 @@ export class Task {
   @Prop({ required: true })
   name: string;
 
-  @Prop({ required: false })
+  @Prop({ required: true })
   description: string;
 
   @Prop({ required: true })
@@ -19,6 +19,9 @@ export class Task {
 
   @Prop({ type: Types.ObjectId, ref: 'Project' })
   project: Project;
+
+  @Prop()
+  creationTime: number;
 }
 
 export const TaskSchema = SchemaFactory.createForClass(Task);
