@@ -5,7 +5,7 @@ import { Model } from 'mongoose';
 import { ITask } from 'src/interfaces/task.interface';
 import { EntityNotFound } from 'src/exceptions/entity-not-found.exception';
 import { CreateTaskDto } from 'src/dto/create-task.dto';
-import { ApiOperation } from 'src/interfaces/api-operation.interface';
+import { ApiOperationResponse } from 'src/interfaces/api-operation-response.interface';
 import { UpdateTaskDto } from 'src/dto/update-task.dto';
 import { TaskResponse } from 'src/interfaces/task-response.interface';
 
@@ -16,12 +16,12 @@ export class TasksService {
     private taskModel: Model<ITask>
   ) {}
 
-  async create(task: CreateTaskDto): Promise<ApiOperation<TaskResponse>> {
-    const { _id, name, description, status, project, creationTime } = await this.taskModel.create({ ...task, creationTime: Date.now() });
+  async create(task: CreateTaskDto): Promise<ApiOperationResponse<ITask>> {
+    const createdTask = await this.taskModel.create({ ...task, creationTime: Date.now() });
 
     return { 
       message: 'Task created successfully',
-      data: { id: _id, name, description, status, project, creationTime }
+      data: createdTask
     };
   }
 
@@ -37,7 +37,7 @@ export class TasksService {
     return task;
   }
 
-  async update(id: string, taskDetails: UpdateTaskDto): Promise<ApiOperation<TaskResponse>> {
+  async update(id: string, taskDetails: UpdateTaskDto): Promise<ApiOperationResponse<ITask>> {
     const task = await this.taskModel.findById(id);
 
     if (!task) throw new EntityNotFound();
@@ -54,11 +54,11 @@ export class TasksService {
         project: task.project,
         creationTime: task.creationTime,
         ...taskDetails 
-      }
+      } as ITask
     };
   }
 
-  async delete(id: string): Promise<ApiOperation<TaskResponse>> {
+  async delete(id: string): Promise<ApiOperationResponse<ITask>> {
     const task = await this.taskModel.findById(id);
 
     if (!task) throw new EntityNotFound();
@@ -74,7 +74,7 @@ export class TasksService {
         status: task.status,
         project: task.project,
         creationTime: task.creationTime
-      }
+      } as ITask
     };
   }
 }

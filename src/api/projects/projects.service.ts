@@ -5,17 +5,17 @@ import { Model } from 'mongoose';
 import { CreateProjectDto } from 'src/dto/create-project.dto';
 import { UpdateProjectDto } from 'src/dto/update-project.dto';
 import { EntityNotFound } from 'src/exceptions/entity-not-found.exception';
-import { ApiOperation } from 'src/interfaces/api-operation.interface';
-import { Project } from 'src/schemes/project.scheme';
+import { ApiOperationResponse } from 'src/interfaces/api-operation-response.interface';
+import { IProject } from 'src/interfaces/project.interface';
 
 @Injectable()
 export class ProjectsService {
   constructor(
     @InjectModel('Project')
-    private projectModel: Model<Project>
+    private projectModel: Model<IProject>
   ) {}
   
-  async create({ name, description, tasks }: CreateProjectDto): Promise<ApiOperation<any>> {
+  async create({ name, description, tasks }: CreateProjectDto): Promise<ApiOperationResponse<IProject>> {
     const existingProject = await this.projectModel.findOne({ name });
 
     if (existingProject) throw new BadRequestException({ message: 'Project with such name already exists' });
@@ -28,11 +28,11 @@ export class ProjectsService {
     };
   }
 
-  async getAll(): Promise<any[]> {
+  async getAll(): Promise<IProject[]> {
     return this.projectModel.find().populate('tasks');
   }
 
-  async getById(id: string): Promise<any> {
+  async getById(id: string): Promise<IProject> {
     const project = await this.projectModel.findById(id).populate('tasks');
 
     if (!project) throw new EntityNotFound();
@@ -40,7 +40,7 @@ export class ProjectsService {
     return project;
   }
 
-  async update(id: string, project: UpdateProjectDto): Promise<ApiOperation<any>> {
+  async update(id: string, project: UpdateProjectDto): Promise<ApiOperationResponse<IProject>> {
     const existingProject = await this.projectModel.findById(id);
 
     if (!existingProject) throw new EntityNotFound();
@@ -55,11 +55,11 @@ export class ProjectsService {
         description: existingProject.description,
         tasks: existingProject.tasks,
         ...project
-      }
+      } as IProject
     };
   }
 
-  async delete(id: string): Promise<ApiOperation<any>> {
+  async delete(id: string): Promise<ApiOperationResponse<IProject>> {
     const existingProject = await this.projectModel.findById(id);
 
     if (!existingProject) throw new EntityNotFound();
