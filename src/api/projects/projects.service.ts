@@ -50,7 +50,7 @@ export class ProjectsService {
 
     return { 
       message: 'Project updated successfully',
-      data: updatedProject
+      data: { ...updatedProject, ...project } as IProject
     };
   }
 
