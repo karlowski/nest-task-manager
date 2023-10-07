@@ -6,6 +6,6 @@ export interface ITask extends Document {
   name: string;
   description: string;
   status: string;
-  project?: Project;
+  project: Project;
   creationTime: number;
 }

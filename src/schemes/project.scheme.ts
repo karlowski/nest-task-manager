@@ -1,14 +1,13 @@
 import { Prop, Schema, SchemaFactory } from "@nestjs/mongoose";
-import { HydratedDocument, ObjectId, SchemaTypes, Types } from "mongoose";
-import { Type } from "class-transformer";
+import { HydratedDocument, Types } from "mongoose";
 
-import { Task, TaskSchema } from "./task.scheme";
+import { Task } from "./task.scheme";
 
 export type ProjectDocument = HydratedDocument<Project>;
 
 @Schema()
 export class Project {
-  // _id: ObjectId;
+  _id: Types.ObjectId;
 
   @Prop({ required: true })
   name: string;
@@ -18,6 +17,9 @@ export class Project {
 
   @Prop([{ type: Task, ref: Task.name }])
   tasks: Task[];
+
+  @Prop()
+  creationTime: number;
 }
 
 export const ProjectSchema = SchemaFactory.createForClass(Project);
