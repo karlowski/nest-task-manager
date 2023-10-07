@@ -1,5 +1,6 @@
 import { IsNotEmpty, IsString, MaxLength } from "class-validator";
 import { CreateTaskDto } from "./create-task.dto";
+import { Types } from "mongoose";
 
 export class CreateProjectDto {
   @IsNotEmpty()
@@ -11,5 +12,5 @@ export class CreateProjectDto {
   description: string;
 
   // tasks: CreateTaskDto[];
-  tasks: string[];
+  tasks: any[];
 }

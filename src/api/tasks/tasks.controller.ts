@@ -4,9 +4,8 @@ import { TasksService } from './tasks.service';
 import { AuthGuard } from 'src/guards/auth.guard';
 import { CreateTaskDto } from 'src/dto/create-task.dto';
 import { ITask } from 'src/interfaces/task.interface';
-import { ApiOperation } from 'src/interfaces/api-operation.interface';
+import { ApiOperationResponse } from 'src/interfaces/api-operation-response.interface';
 import { UpdateTaskDto } from 'src/dto/update-task.dto';
-import { TaskResponse } from 'src/interfaces/task-response.interface';
 import { ParseObjectIdPipe } from 'src/pipes/parse-object-id/parse-object-id.pipe';
 import { ParseTaskStatusPipe } from 'src/pipes/parse-task-status/parse-task-status.pipe';
 
@@ -16,7 +15,7 @@ export class TasksController {
   constructor(private tasksService: TasksService) {}
 
   @Post()
-  create(@Body() task: CreateTaskDto): Promise<ApiOperation<TaskResponse>> {
+  create(@Body() task: CreateTaskDto): Promise<ApiOperationResponse<ITask>> {
     return this.tasksService.create(task);
   }
 
@@ -31,7 +30,7 @@ export class TasksController {
   }
 
   @Patch(':id')
-  update(@Param('id', ParseObjectIdPipe) id: string, @Body() task: UpdateTaskDto): Promise<ApiOperation<TaskResponse>> {
+  update(@Param('id', ParseObjectIdPipe) id: string, @Body() task: UpdateTaskDto): Promise<ApiOperationResponse<ITask>> {
     return this.tasksService.update(id, task);
   }
 
@@ -39,7 +38,7 @@ export class TasksController {
   changeStatus(
     @Param('id', ParseObjectIdPipe) id: string, 
     @Body(ParseTaskStatusPipe) { status }: Record<string, string>
-  ): Promise<ApiOperation<TaskResponse>> {
+  ): Promise<ApiOperationResponse<ITask>> {
     return this.tasksService.update(id, { status });
   }
 
@@ -47,17 +46,17 @@ export class TasksController {
   assignToProject(
     @Param('id', ParseObjectIdPipe) id: string, 
     @Param('projectId', ParseObjectIdPipe) projectId: string
-  ): Promise<ApiOperation<TaskResponse>> {
+  ): Promise<ApiOperationResponse<ITask>> {
     return this.tasksService.update(id, { project: projectId });
   }
 
   @Patch(':id/unassign')
-  UnassignFromProject(@Param('id', ParseObjectIdPipe) id: string): Promise<ApiOperation<TaskResponse>> {
+  UnassignFromProject(@Param('id', ParseObjectIdPipe) id: string): Promise<ApiOperationResponse<ITask>> {
     return this.tasksService.update(id, { project: null });
   }
 
   @Delete(':id')
-  delete(@Param('id', ParseObjectIdPipe) id: string): Promise<ApiOperation<TaskResponse>> {
+  delete(@Param('id', ParseObjectIdPipe) id: string): Promise<ApiOperationResponse<ITask>> {
     return this.tasksService.delete(id);
   }
 
