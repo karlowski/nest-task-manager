@@ -7,6 +7,7 @@ import { UpdateProjectDto } from 'src/dto/update-project.dto';
 import { EntityNotFound } from 'src/exceptions/entity-not-found.exception';
 import { ApiOperationResponse } from 'src/interfaces/api-operation-response.interface';
 import { IProject } from 'src/interfaces/project.interface';
+import { Task } from 'src/schemes/task.scheme';
 
 @Injectable()
 export class ProjectsService {
@@ -45,17 +46,51 @@ export class ProjectsService {
 
     if (!existingProject) throw new EntityNotFound();
 
-    const updatedProjectResponse = await this.projectModel.updateOne({ _id: id }, project);
+    const updatedProject = await this.projectModel.findByIdAndUpdate(id, project);
 
     return { 
-      message: 'Project created successfully',
-      data: {
-        id,
-        name: existingProject.name,
-        description: existingProject.description,
-        tasks: existingProject.tasks,
-        ...project
-      } as IProject
+      message: 'Project updated successfully',
+      data: updatedProject
+    };
+  }
+
+  async assignTask(id: string, taskId: string,): Promise<ApiOperationResponse<IProject>> {
+    const existingProject = await this.projectModel.findById(id);
+
+    if (!existingProject) throw new EntityNotFound();
+
+    const taskAlreadyAssigned = existingProject.tasks.find((task) => task._id.toString() === taskId);
+
+    if (taskAlreadyAssigned) throw new BadRequestException({ message: 'Task already assigned to this project' });
+
+    const updatedTasks = [...existingProject.tasks, { _id: taskId }];
+    const updatedProject = await this.projectModel.findByIdAndUpdate(id, { tasks: updatedTasks });
+
+    updatedProject.tasks = updatedTasks as Task[];
+
+    return { 
+      message: 'Project updated successfully',
+      data: updatedProject
+    };
+  }
+
+  async unassignTask(id: string, taskId: string,): Promise<ApiOperationResponse<IProject>> {
+    const existingProject = await this.projectModel.findById(id);
+
+    if (!existingProject) throw new EntityNotFound();
+
+    const taskAssigned = existingProject.tasks.find((task) => task._id.toString() === taskId);
+
+    if (!taskAssigned) throw new BadRequestException({ message: 'No such task assigned to this project' });
+
+    const updatedTasks = existingProject.tasks.filter((task) => task._id.toString() !== taskId);
+    const updatedProject = await this.projectModel.findByIdAndUpdate(id, { tasks: updatedTasks });
+
+    updatedProject.tasks = updatedTasks;
+
+    return { 
+      message: 'Project updated successfully',
+      data: updatedProject
     };
   }
 
@@ -64,11 +99,11 @@ export class ProjectsService {
 
     if (!existingProject) throw new EntityNotFound();
 
-    const deletedProjectResponse = await this.projectModel.deleteOne({ _id: id });
+    const deletedProject = await this.projectModel.findByIdAndDelete(id);
 
     return { 
       message: 'Project deleted successfully',
-      data: existingProject
+      data: deletedProject
     };
   }
 }

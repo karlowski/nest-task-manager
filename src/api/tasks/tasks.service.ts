@@ -7,7 +7,6 @@ import { EntityNotFound } from 'src/exceptions/entity-not-found.exception';
 import { CreateTaskDto } from 'src/dto/create-task.dto';
 import { ApiOperationResponse } from 'src/interfaces/api-operation-response.interface';
 import { UpdateTaskDto } from 'src/dto/update-task.dto';
-import { TaskResponse } from 'src/interfaces/task-response.interface';
 
 @Injectable()
 export class TasksService {
@@ -42,19 +41,11 @@ export class TasksService {
 
     if (!task) throw new EntityNotFound();
 
-    const updatedTaskResponse = await this.taskModel.updateOne({ _id: id }, taskDetails);
+    const updatedTask = await this.taskModel.findByIdAndUpdate(id, taskDetails);
 
     return { 
       message: 'Task updated successfully',
-      data: { 
-        id: task._id,
-        name: task.name,
-        description: task.description,
-        status: task.status,
-        project: task.project,
-        creationTime: task.creationTime,
-        ...taskDetails 
-      } as ITask
+      data: updatedTask
     };
   }
 
@@ -63,18 +54,11 @@ export class TasksService {
 
     if (!task) throw new EntityNotFound();
     
-    const deletedTaskResponse = await this.taskModel.deleteOne({ _id: id });
+    const deletedTask = await this.taskModel.findByIdAndDelete(id);
 
     return { 
       message: 'Task deleted successfully',
-      data: { 
-        id: task._id,
-        name: task.name,
-        description: task.description,
-        status: task.status,
-        project: task.project,
-        creationTime: task.creationTime
-      } as ITask
+      data: deletedTask
     };
   }
 }

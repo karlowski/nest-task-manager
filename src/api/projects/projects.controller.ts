@@ -33,6 +33,22 @@ export class ProjectsController {
     return this.projectsService.update(id, project);
   }
 
+  @Patch(':id/assign/:taskId')
+  assignTask(
+    @Param('id', ParseObjectIdPipe) id: string, 
+    @Param('taskId', ParseObjectIdPipe) taskId: string
+    ): Promise<ApiOperationResponse<IProject>> {
+    return this.projectsService.assignTask(id, taskId);
+  }
+
+  @Patch(':id/unassign/:taskId')
+  unassignTask(
+    @Param('id', ParseObjectIdPipe) id: string, 
+    @Param('taskId', ParseObjectIdPipe) taskId: string
+    ): Promise<ApiOperationResponse<IProject>> {
+    return this.projectsService.unassignTask(id, taskId);
+  }
+
   @Delete(':id')
   delete(@Param('id', ParseObjectIdPipe) id: string): Promise<ApiOperationResponse<IProject>> {
     return this.projectsService.delete(id);
