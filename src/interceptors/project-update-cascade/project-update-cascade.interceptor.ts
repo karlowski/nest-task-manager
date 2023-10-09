@@ -1,4 +1,4 @@
-import { CallHandler, ExecutionContext, Injectable, NestInterceptor } from '@nestjs/common';
+import { BadRequestException, CallHandler, ExecutionContext, Injectable, NestInterceptor } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model, Types } from 'mongoose';
 import { Observable, combineLatest, from, map, mergeMap, of, switchMap, tap } from 'rxjs';
@@ -29,9 +29,14 @@ export class ProjectUpdateCascadeInterceptor implements NestInterceptor {
             from(this.projectModel.findById(projectId))
           ]).pipe(
             switchMap(([responseData, project]) => {
+              const isProjectAssigned = project.tasks.find((task) => task._id.toString() === taskId);
               const updatedTasks = this.isAssign(request.route.path) 
                 ? [...project.tasks, { _id: taskId }] 
                 : project.tasks.filter((task) => task._id.toString() !== taskId);
+              
+              if (isProjectAssigned) {
+                throw new BadRequestException({ message: 'Task is already assigned to this project' });
+              }
 
               return combineLatest([
                 of(responseData),
