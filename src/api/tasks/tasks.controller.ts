@@ -1,4 +1,4 @@
-import { Body, Controller, Delete, Get, Param, Patch, Post, UseGuards } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, Patch, Post, UseGuards, UseInterceptors } from '@nestjs/common';
 
 import { TasksService } from './tasks.service';
 import { AuthGuard } from 'src/guards/auth.guard';
@@ -8,6 +8,7 @@ import { ApiOperationResponse } from 'src/interfaces/api-operation-response.inte
 import { UpdateTaskDto } from 'src/dto/update-task.dto';
 import { ParseObjectIdPipe } from 'src/pipes/parse-object-id/parse-object-id.pipe';
 import { ParseTaskStatusPipe } from 'src/pipes/parse-task-status/parse-task-status.pipe';
+import { ProjectUpdateCascadeInterceptor } from 'src/interceptors/project-update-cascade/project-update-cascade.interceptor';
 
 @UseGuards(AuthGuard)
 @Controller('tasks')
@@ -42,6 +43,7 @@ export class TasksController {
     return this.tasksService.update(id, { status });
   }
 
+  @UseInterceptors(ProjectUpdateCascadeInterceptor)
   @Patch(':id/assign/:projectId')
   assignToProject(
     @Param('id', ParseObjectIdPipe) id: string, 
@@ -50,8 +52,12 @@ export class TasksController {
     return this.tasksService.update(id, { project: projectId });
   }
 
-  @Patch(':id/unassign')
-  UnassignFromProject(@Param('id', ParseObjectIdPipe) id: string): Promise<ApiOperationResponse<ITask>> {
+  @UseInterceptors(ProjectUpdateCascadeInterceptor)
+  @Patch(':id/unassign/:projectId')
+  UnassignFromProject(
+    @Param('id', ParseObjectIdPipe) id: string,
+    @Param('projectId', ParseObjectIdPipe) projectId: string
+  ): Promise<ApiOperationResponse<ITask>> {
     return this.tasksService.update(id, { project: null });
   }
 
