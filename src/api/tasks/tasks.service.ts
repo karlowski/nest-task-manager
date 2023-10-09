@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 
@@ -17,6 +17,10 @@ export class TasksService {
   ) {}
 
   async create(task: CreateTaskDto): Promise<ApiOperationResponse<ITask>> {
+    const existingTask = await this.taskModel.findOne({ name: task.name });
+
+    if (existingTask) throw new BadRequestException({ message: 'Task with such name already exists' });
+
     const createdTask = await this.taskModel.create({ 
       ...task, 
       project: task.project || null,
