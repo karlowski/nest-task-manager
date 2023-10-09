@@ -6,9 +6,10 @@ import * as bcrypt from 'bcrypt';
 
 import { CreateUserDto } from 'src/dto/create-user.dto';
 import { IUser } from 'src/interfaces/user.interface';
-import { UserResponse } from 'src/interfaces/user-response.interface';
+import { NewUser } from 'src/interfaces/new-user.interface';
 import { FailedLoginException } from 'src/exceptions/failed-login.exception';
-import { TokenResponse } from 'src/interfaces/token-response.interface';
+import { AccessToken } from 'src/interfaces/access-token.interface';
+import { ApiOperationResponse } from 'src/interfaces/api-operation-response.interface';
 
 @Injectable()
 export class AuthService {
@@ -18,15 +19,14 @@ export class AuthService {
     private jwt: JwtService
   ) {}
 
-  async login(email: string, password: string): Promise<TokenResponse> {
+  async login(email: string, password: string): Promise<AccessToken> {
     const existingUser = await this.userModel.findOne({ email });
 
     if (!existingUser) throw new HttpException({ message: 'User does not exist' }, HttpStatus.BAD_REQUEST);
 
     const isPasswordsMatch = await bcrypt.compare(password, existingUser.password);
-    const isEmailsMatch = email === existingUser.email;
 
-    if (!isPasswordsMatch || !isEmailsMatch) throw new FailedLoginException();
+    if (!isPasswordsMatch) throw new FailedLoginException();
 
     const tokenPayload = { sub: existingUser.id, username: existingUser.username };
     const token = await this.jwt.sign(tokenPayload);
@@ -34,7 +34,7 @@ export class AuthService {
     return { access_token: token };
   }
 
-  async signUp(user: CreateUserDto): Promise<UserResponse> {
+  async signUp(user: CreateUserDto): Promise<ApiOperationResponse<NewUser>> {
     const existingUser = await this.userModel.findOne({ email: user.email });
 
     if (existingUser) throw new HttpException({ message: 'User already exists' }, HttpStatus.BAD_REQUEST);
@@ -49,7 +49,15 @@ export class AuthService {
         creationTime: timestamp 
       });
 
-      return { id: _id, username, email, creationTime };
+      return {
+        message: 'New user created successfullt',
+        data: { 
+          id: _id, 
+          username, 
+          email, 
+          creationTime 
+        }
+      };
     } catch (error) {
       throw new BadRequestException(error);
     }
