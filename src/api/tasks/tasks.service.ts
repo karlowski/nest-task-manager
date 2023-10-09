@@ -16,7 +16,11 @@ export class TasksService {
   ) {}
 
   async create(task: CreateTaskDto): Promise<ApiOperationResponse<ITask>> {
-    const createdTask = await this.taskModel.create({ ...task, creationTime: Date.now() });
+    const createdTask = await this.taskModel.create({ 
+      ...task, 
+      project: task.project || null,
+      creationTime: Date.now() 
+    });
 
     return { 
       message: 'Task created successfully',
